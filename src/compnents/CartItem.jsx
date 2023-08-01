@@ -3,8 +3,7 @@ const CartItem = ({item}) => {
     return (
         <div className="md:flex items-strech py-8 md:py-10 lg:py-8">
             <div className="md:w-4/12 2xl:w-1/4 w-full">
-                <img src="https://i.ibb.co/SX762kX/Rectangle-36-1.png" alt="Black Leather Bag" className="h-full object-center object-cover md:block hidden" />
-                <img src="https://i.ibb.co/g9xsdCM/Rectangle-37.pngg" alt="Black Leather Bag" className="md:hidden w-full h-full object-center object-cover" />
+                <img src={item?.product_thumbnail_image} alt="Black Leather Bag" className="h-full object-center object-cover md:block hidden" />
             </div>
             <div className="md:pl-3 md:w-8/12 2xl:w-3/4 flex flex-col justify-center">
                 <div className="flex items-center gap-3 w-full pt-1">
@@ -12,7 +11,7 @@ const CartItem = ({item}) => {
                         {item?.product_name} (#{item?.product_code})
                     </p>
                 </div>
-                <div>
+                {/* <div>
                     {
                         item?variations.map(variation => {
                             return (
@@ -24,7 +23,7 @@ const CartItem = ({item}) => {
                             )
                         })
                     }
-                </div>
+                </div> */}
                 <div className="flex items-center justify-between pt-5">
                     <p className="font-black leading-none text-gray-800 dark:text-white">1</p>
                     <p className="font-black leading-none text-gray-800 dark:text-white">$9,000</p>
