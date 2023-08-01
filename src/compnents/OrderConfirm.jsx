@@ -43,7 +43,7 @@ const OrderConfirm = () => {
                 <div className="flex lg:flex-row flex-col justify-end" id="cart">
                     <div className="w-1/2">
                         <CustomerInfo customer={cart?.customer}/>
-                        <Cart/>
+                        <Cart items={cart?.items}/>
                     </div>
                     <div className="w-1/2 bg-gray-100 dark:bg-gray-900 h-full">
                         <BillInfo/>
