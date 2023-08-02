@@ -7,17 +7,17 @@ import axios from 'axios'
 
 const OrderConfirm = () => {
 
-    const apiUrl = 'http://phpstack-924353-3259330.cloudwaysapps.com/api/v2/';
+    const apiUrl = 'http://localhost/checkbox-v2/api/v2/';
     const customHeaderName = 'Checkbox-Api-V2-Key';
     const customHeaderValue = '83324867-6668-4c04-bf36-91714ea8b3e3';
-    const accessToken = '278|9loDyr1AF3j7W3HEj26Kr03bcRwAehpwKAqb09wz';
+    const accessToken = '51|mcDG2AWWgN7m1oAlH5I4E9wQ0GB82eMvePsNUMnB';
 
     const [cart, setCart] = useState(null)
     const [otherFees, setOtherFees] = useState(null)
 
     const getCartInfo = () => {
         // Axios GET request with custom header
-        axios.get(apiUrl+"carts/63", {
+        axios.get(apiUrl+"carts/13", {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 [customHeaderName]: customHeaderValue,
@@ -38,12 +38,12 @@ const OrderConfirm = () => {
         // Axios GET request with custom header
         const requestData = {
             type: 'bill_info',
-            reseller_to_customer_price: 1800,
+            reseller_to_customer_price: 10000,
             advance_from_customer: 100
         };
 
-            // Axios POST request with custom header and authentication bearer token
-        axios.post(apiUrl+'carts/update/63', requestData, {
+        // Axios POST request with custom header and authentication bearer token
+        axios.post(apiUrl+'carts/update/13', requestData, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 [customHeaderName]: customHeaderValue,
@@ -61,7 +61,7 @@ const OrderConfirm = () => {
 
     const getOtherFees = () => {
         // Axios GET request with custom header
-        axios.get(apiUrl+'carts/get-other-fees/63', {
+        axios.get(apiUrl+'carts/get-other-fees/13', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 [customHeaderName]: customHeaderValue,
