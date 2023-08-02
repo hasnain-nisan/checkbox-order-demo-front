@@ -19,7 +19,6 @@ const BillInfo = ({cart, otherFees}) => {
     const [total_earn, set_total_earn] = useState(0)
 
     const calculateTotalEarnings = (discount) => {
-        console.log(discount, "dis");
         set_total_earn(total_collection_amount - (supplier_amount + processing_fees + shipping_fee) + discount)
     }
 
@@ -66,6 +65,33 @@ const BillInfo = ({cart, otherFees}) => {
             setCouponCode("")
             setCoupon(null)
             calculateTotalEarnings(0)
+        })
+        .catch(error => {
+            // Handle errors here
+            console.error('Error:', error);
+        });
+    }
+
+    const submitOrder = () => {
+        // Axios GET request with custom header
+        const requestData = {
+            cart_id: 13,
+            processing_fee: processing_fees,
+            delivery_charge: shipping_fee,
+            coupon_type: coupon?.voucher_type,
+            coupon_amount: coupon?.amount
+        };
+
+        // Axios POST request with custom header and authentication bearer token
+        axios.post(apiUrl+'order/store', requestData, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                [customHeaderName]: customHeaderValue,
+            }
+        })
+        .then(response => {
+            // Handle the response data here
+            console.log('Response:', response.data);
         })
         .catch(error => {
             // Handle errors here
@@ -158,7 +184,13 @@ const BillInfo = ({cart, otherFees}) => {
                         {total_earn} TK.
                     </p>
                 </div>
-                <button onClick="checkoutHandler1(true)" className="text-base leading-none w-full py-5 bg-gray-800 border-gray-800 border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 text-white dark:hover:bg-gray-700">Checkout</button>
+                <button 
+                    onClick={submitOrder}
+                    className="text-base leading-none w-full py-5 bg-gray-800 border-gray-800 border focus:outline-none focus:ring-2 focus:ring-offset-2
+                         focus:ring-gray-800 text-white dark:hover:bg-gray-700"
+                >
+                    Checkout
+                </button>
             </div>
         </div>
     )
