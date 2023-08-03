@@ -1,26 +1,40 @@
+/* eslint-disable react/prop-types */
 import axios from "axios"
 import {MdDelete} from 'react-icons/md'
 import { useEffect, useState } from "react"
 
-const BillInfo = ({cart, otherFees}) => {
+const BillInfo = ({cart, otherFees, userInfo}) => {
 
     let total_collection_amount = (cart?.reseller_to_customer_price - cart?.advance_from_customer)
     let supplier_amount = cart?.price
     let processing_fees = otherFees?.processing_fee.amount
     let shipping_fee = otherFees?.shipping_fee
-
-    const apiUrl = 'http://localhost/checkbox-v2/api/v2/';
-    const customHeaderName = 'Checkbox-Api-V2-Key';
-    const customHeaderValue = '83324867-6668-4c04-bf36-91714ea8b3e3';
-    const accessToken = '51|mcDG2AWWgN7m1oAlH5I4E9wQ0GB82eMvePsNUMnB';
+    let payableAmount = 0;
 
     const [couponCode, setCouponCode] = useState("")
     const [coupon, setCoupon] = useState(null)
     const [total_earn, set_total_earn] = useState(0)
 
-    const calculateTotalEarnings = (discount) => {
-        set_total_earn(total_collection_amount - (supplier_amount + processing_fees + shipping_fee) + discount)
-    }
+    const calculateTotalEarnings = () => {
+        console.log(coupon);
+        if(coupon){
+            if (coupon?.type === 'cashback') {
+                set_total_earn((total_collection_amount - (supplier_amount + processing_fees + shipping_fee)) + (coupon?.amount * (-1)));
+            } else {
+                set_total_earn((total_collection_amount - (supplier_amount + processing_fees + shipping_fee) )- (coupon?.amount * (-1)));
+            }
+        } else {
+            set_total_earn(total_collection_amount - (supplier_amount + processing_fees + shipping_fee))
+        }
+
+        // if(userInfo?.numb_of_orders === 0 && total_earn >= 0){
+        //     set_total_earn((prevTotalEarn) => {
+        //     // Perform your calculations here using prevTotalEarn and discount
+        //     // For example, if you want to add the discount to the previous total_earn
+        //         return prevTotalEarn - shipping_fee;
+        //     });
+        // }
+    };
 
     const applyCoupon = () => {
         const requestData = {
@@ -29,17 +43,12 @@ const BillInfo = ({cart, otherFees}) => {
         };
 
         // Axios POST request with custom header and authentication bearer token
-        axios.post(apiUrl+'coupon-apply', requestData, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        axios.post(axios.defaults.baseURL+'coupon-apply', requestData)
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
             setCoupon(response.data.data)
-            calculateTotalEarnings(response.data.data.amount)
+            calculateTotalEarnings()
         })
         .catch(error => {
             // Handle errors here
@@ -53,18 +62,13 @@ const BillInfo = ({cart, otherFees}) => {
         };
 
         // Axios POST request with custom header and authentication bearer token
-        axios.post(apiUrl+'coupon-remove', requestData, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        axios.post(axios.defaults.baseURL+'coupon-remove', requestData)
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
             setCouponCode("")
             setCoupon(null)
-            calculateTotalEarnings(0)
+            calculateTotalEarnings()
         })
         .catch(error => {
             // Handle errors here
@@ -82,13 +86,25 @@ const BillInfo = ({cart, otherFees}) => {
             coupon_amount: coupon?.amount
         };
 
-        // Axios POST request with custom header and authentication bearer token
-        axios.post(apiUrl+'order/store', requestData, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        if(total_earn < 0 || userInfo?.numb_of_orders === 0  ){
+            payAndOrder(requestData)
+        } else {
+            orderNow(requestData)
+        }
+    }
+
+    const genSubmitOrderBtnText = () => {
+        if(total_earn < 0){
+            return `Pay ${total_earn * (-1)} tk. and Order`
+        } else if(userInfo?.numb_of_orders === 0){
+            return `Pay ${shipping_fee} tk. and Order`
+        } else {
+            return "Order now"
+        }
+    }
+
+    const orderNow = (requestData) => {
+        axios.post(axios.defaults.baseURL+'order/store', requestData)
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
@@ -99,8 +115,34 @@ const BillInfo = ({cart, otherFees}) => {
         });
     }
 
+    const payAndOrder = (requestData) => {
+        axios.get(axios.defaults.baseURL+"sslcommerz/begin", {
+            params: {
+                payment_type: "due_payment",
+                amount: 60,
+                cart_id: 13
+            }
+        })
+        .then(response => {
+            // Handle the response data here
+            console.log('Response:', response.data);
+            window.location.href = response.data.url
+        })
+        .catch(error => {
+            // Handle errors here
+            console.error('Error:', error);
+        });
+    }
+
     useEffect(() => {
-        calculateTotalEarnings(0)
+        calculateTotalEarnings()
+        if(cart?.coupon){
+            setCoupon({
+                coupon_code: cart?.coupon?.code,
+                voucher_type: cart?.coupon?.cashback_discount,
+                amount: cart?.discount
+            })
+        }
     }, [cart])
 
     return (
@@ -189,7 +231,7 @@ const BillInfo = ({cart, otherFees}) => {
                     className="text-base leading-none w-full py-5 bg-gray-800 border-gray-800 border focus:outline-none focus:ring-2 focus:ring-offset-2
                          focus:ring-gray-800 text-white dark:hover:bg-gray-700"
                 >
-                    Checkout
+                    {genSubmitOrderBtnText()}
                 </button>
             </div>
         </div>

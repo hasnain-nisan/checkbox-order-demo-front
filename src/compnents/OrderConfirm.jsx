@@ -7,22 +7,13 @@ import axios from 'axios'
 
 const OrderConfirm = () => {
 
-    const apiUrl = 'http://localhost/checkbox-v2/api/v2/';
-    const customHeaderName = 'Checkbox-Api-V2-Key';
-    const customHeaderValue = '83324867-6668-4c04-bf36-91714ea8b3e3';
-    const accessToken = '51|mcDG2AWWgN7m1oAlH5I4E9wQ0GB82eMvePsNUMnB';
-
     const [cart, setCart] = useState(null)
     const [otherFees, setOtherFees] = useState(null)
+    const [userInfo, setUserInfo] = useState(null)
 
     const getCartInfo = () => {
         // Axios GET request with custom header
-        axios.get(apiUrl+"carts/13", {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        axios.get(axios.defaults.baseURL+"carts/13")
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
@@ -43,12 +34,7 @@ const OrderConfirm = () => {
         };
 
         // Axios POST request with custom header and authentication bearer token
-        axios.post(apiUrl+'carts/update/13', requestData, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        axios.post(axios.defaults.baseURL+'carts/update/13', requestData)
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
@@ -61,12 +47,7 @@ const OrderConfirm = () => {
 
     const getOtherFees = () => {
         // Axios GET request with custom header
-        axios.get(apiUrl+'carts/get-other-fees/13', {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                [customHeaderName]: customHeaderValue,
-            }
-        })
+        axios.get(axios.defaults.baseURL+'carts/get-other-fees/13')
         .then(response => {
             // Handle the response data here
             console.log('Response:', response.data);
@@ -78,9 +59,24 @@ const OrderConfirm = () => {
         });
     }
 
+    const getUserInfo = () => {
+        // Axios GET request with custom header
+        axios.get(axios.defaults.baseURL+'auth/user')
+        .then(response => {
+            // Handle the response data here
+            console.log('Response:', response.data);
+            setUserInfo(response.data.data)
+        })
+        .catch(error => {
+            // Handle errors here
+            console.error('Error:', error);
+        });
+    }
+
     useEffect(() => {
         getCartInfo()
         getOtherFees()
+        getUserInfo()
         // updateCartInfo()
     }, [])
 
@@ -93,7 +89,7 @@ const OrderConfirm = () => {
                         <Cart items={cart?.items}/>
                     </div>
                     <div className="w-1/2 bg-gray-100 dark:bg-gray-900 h-full">
-                        <BillInfo cart={cart} otherFees={otherFees}/>
+                        <BillInfo cart={cart} otherFees={otherFees} userInfo={userInfo}/>
                     </div>
                 </div>
             </div>
