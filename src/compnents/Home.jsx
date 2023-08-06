@@ -6,13 +6,37 @@ import {ImLocation2} from 'react-icons/im'
 import CustomerInfo from "./CustomerInfo"
 import Cart from "./Cart"
 import BillInfo from "./BillInfo"
+import axios from "axios"
+import { useEffect, useState } from "react"
 
 const Home = () => {
 
     const navigate = useNavigate();
 
+    const [userInfo, setUserInfo] = useState(null)
+
+    const getUserInfo = () => {
+        // Axios GET request with custom header
+        axios.get(axios.defaults.baseURL+'auth/user')
+        .then(response => {
+            // Handle the response data here
+            console.log('Response:', response.data);
+            setUserInfo(response.data.data)
+        })
+        .catch(error => {
+            // Handle errors here
+            console.error('Error:', error);
+        });
+    }
+
+    useEffect(() => {
+        getUserInfo()
+    }, [])
+
+
+
     return (
-        <div className='w-full mt-10 flex justify-center'>
+        <div className='w-full mt-10 flex justify-center h-[100vh]'>
             <button className="flex justify-center items-center gap-2 py-2.5 px-5 mr-2 mb-2 text-sm font-medium
                 text-gray-900 focus:outline-none bg-white rounded-lg border
                 border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4

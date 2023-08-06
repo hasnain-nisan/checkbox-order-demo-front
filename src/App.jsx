@@ -4,6 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./compnents/Home";
 import OrderConfirm from "./compnents/OrderConfirm";
 import axios from "axios";
+import OrderSuccess from "./compnents/OrderSuccess";
+import ShopInfo from "./compnents/ShopInfo";
 
 function App() {
 
@@ -18,6 +20,8 @@ function App() {
       <Routes>
         <Route path="/" element={ <Home/> } />
         <Route path="/order-confirmation" element={ <OrderConfirm/> } />
+        <Route path="/order-success" element={ <OrderSuccess/> } />
+        <Route path="/add-shop-info" element={ <ShopInfo/> } />
       </Routes>
     </div>
   )
